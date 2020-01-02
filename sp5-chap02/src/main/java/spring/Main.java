@@ -7,16 +7,15 @@ import java.io.InputStreamReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import assembler.Assembler;
-import config.AppCtx;
+import config.AppConf1;
+import config.AppConf2;
 
 public class Main {
 	// 스프링 컨테이너를 사용하도록 변경
 	private static ApplicationContext ctx = null;
-	private static Assembler assembler = new Assembler();
 	
 	public static void main(String[] args) throws IOException {
-		ctx = new AnnotationConfigApplicationContext(AppCtx.class);
+		ctx = new AnnotationConfigApplicationContext(AppConf1.class, AppConf2.class);
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -34,6 +33,15 @@ public class Main {
 				continue;
 			} else if(command.startsWith("change ")) {
 				processChangeCommand(command.split(" "));
+				continue;
+			} else if(command.equals("list")) {
+				processListCommand();
+				continue;
+			} else if(command.startsWith("info ")) {
+				processInfoCommand(command.split(" "));
+				continue;
+			} else if(command.equals("version")) {
+				processVersionCommand();
 				continue;
 			}
 			printHelp();
@@ -80,12 +88,34 @@ public class Main {
 		}
 	}
 	
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+	
+	private static void processInfoCommand(String[] arg) {
+		if(arg.length != 2) {
+			printHelp();
+			return;
+		}
+		MemberInfoPrinter infoPrinter = ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+	
 	private static void printHelp() {
 		System.out.println();
 		System.out.println("잘못된 명력입니다. 아래 명령어 사용법을 확인하세요.");
 		System.out.println("***명령어 사용법***");
 		System.out.println("new 이메일 이름 암호 암호확인");
 		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println("list");
+		System.out.println("info 이메일");
+		System.out.println("version");
 		System.out.println();
 	}
 }
