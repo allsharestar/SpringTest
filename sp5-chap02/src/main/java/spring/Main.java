@@ -4,17 +4,48 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 import assembler.Assembler;
+import config.AppCtx;
 
 public class Main {
+	// 스프링 컨테이너를 사용하도록 변경
+	private static ApplicationContext ctx = null;
 	private static Assembler assembler = new Assembler();
+	
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(AppCtx.class);
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		
+		while(true) {
+			System.out.print("명령어를 입력하세요 : ");
+			
+			String command = reader.readLine();
+			
+			if(command.equalsIgnoreCase("exit")) {
+				System.out.println("종료합니다.");
+				break;
+			}
+			if(command.startsWith("new ")) {
+				processNewCommand(command.split(" "));
+				continue;
+			} else if(command.startsWith("change ")) {
+				processChangeCommand(command.split(" "));
+				continue;
+			}
+			printHelp();
+		}
+	}
 	
 	private static void processNewCommand(String[] arg) {
 		if(arg.length != 5) {
 			printHelp();
 			return;
 		}
-		MemberRegisterService regSvc = assembler.getMemberRegisterService();
+		MemberRegisterService regSvc = ctx.getBean("memberRegSvc", MemberRegisterService.class);
 		RegisterRequest req = new RegisterRequest();
 		req.setEmail(arg[1]);
 		req.setName(arg[2]);
@@ -38,7 +69,7 @@ public class Main {
 			printHelp();
 			return;
 		}
-		ChangePasswordService changePwdSvc = assembler.getChangePasswordService();
+		ChangePasswordService changePwdSvc = ctx.getBean("changePwdSvc", ChangePasswordService.class);
 		try {
 			changePwdSvc.ChangePasswordService(arg[1], arg[2], arg[3]);
 			System.out.println("암호를 변경했습니다.\n");
@@ -56,28 +87,5 @@ public class Main {
 		System.out.println("new 이메일 이름 암호 암호확인");
 		System.out.println("change 이메일 현재비번 변경비번");
 		System.out.println();
-	}
-	
-	public static void main(String[] args) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		
-		while(true) {
-			System.out.print("명령어를 입력하세요 : ");
-			
-			String command = reader.readLine();
-			
-			if(command.equalsIgnoreCase("exit")) {
-				System.out.println("종료합니다.");
-				break;
-			}
-			if(command.startsWith("new ")) {
-				processNewCommand(command.split(" "));
-				continue;
-			} else if(command.startsWith("change ")) {
-				processChangeCommand(command.split(" "));
-				continue;
-			}
-			printHelp();
-		}
 	}
 }
