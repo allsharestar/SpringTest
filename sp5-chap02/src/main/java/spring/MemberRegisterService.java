@@ -2,13 +2,15 @@ package spring;
 
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
 public class MemberRegisterService {
 	// 회원등록하는 클래스를 만들어봄
-	private MemberDao memberDao;
 	
-	public MemberRegisterService(MemberDao memberDao) {
-		this.memberDao = memberDao;
-	}
+	@Autowired
+	private MemberDao memberDao;
 	
 	public Long regist(RegisterRequest req) {
 		Member member = memberDao.selectByEmail(req.getEmail());

@@ -7,15 +7,15 @@ import java.io.InputStreamReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import config.AppConf1;
-import config.AppConf2;
+import config.AppCtx;
 
 public class Main {
 	// 스프링 컨테이너를 사용하도록 변경
 	private static ApplicationContext ctx = null;
 	
 	public static void main(String[] args) throws IOException {
-		ctx = new AnnotationConfigApplicationContext(AppConf1.class, AppConf2.class);
+		// AppConf1클래스에 @import 애노테이션으로 AppConf2도 스프링 컨테이너 설정파일로 등록했다.
+		ctx = new AnnotationConfigApplicationContext(AppCtx.class);
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -53,7 +53,7 @@ public class Main {
 			printHelp();
 			return;
 		}
-		MemberRegisterService regSvc = ctx.getBean("memberRegSvc", MemberRegisterService.class);
+		MemberRegisterService regSvc = ctx.getBean(MemberRegisterService.class);
 		RegisterRequest req = new RegisterRequest();
 		req.setEmail(arg[1]);
 		req.setName(arg[2]);
@@ -77,7 +77,7 @@ public class Main {
 			printHelp();
 			return;
 		}
-		ChangePasswordService changePwdSvc = ctx.getBean("changePwdSvc", ChangePasswordService.class);
+		ChangePasswordService changePwdSvc = ctx.getBean(ChangePasswordService.class);
 		try {
 			changePwdSvc.ChangePasswordService(arg[1], arg[2], arg[3]);
 			System.out.println("암호를 변경했습니다.\n");

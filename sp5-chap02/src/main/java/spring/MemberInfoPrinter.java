@@ -1,13 +1,17 @@
 package spring;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component("infoPrinter")
 public class MemberInfoPrinter {
+	@Autowired
 	private MemberDao memberDao;
 	private MemberPrinter printer;
 	
-	public void setMemeberDao(MemberDao memberDao) {
-		this.memberDao = memberDao;
-	}
-	
+	@Autowired
+	@Qualifier("printer")
 	public void setPrinter(MemberPrinter printer) {
 		this.printer = printer;
 	}
