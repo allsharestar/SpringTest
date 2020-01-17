@@ -11,6 +11,11 @@ repositories {
 dependencies {
 	compile 'org.springframework:spring-context:5.0.2.RELEASE'
 	compile 'org.aspectj:aspectjweaver:1.8.13'
+	compile 'org.springframework:spring-jdbc:5.0.2.RELEASE'
+	compile 'org.apache.tomcat:tomcat-jdbc:8.5.27'
+	compile 'mysql:mysql-connector-java:5.1.45'
+//	compile 'org.slf4j:slf4j-api:1.75.25'
+	compile 'ch.qos.logback:logback-classic:1.2.3'
 }
 
 wrapper {

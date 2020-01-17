@@ -6,8 +6,6 @@ import java.util.Map;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.core.annotation.Order;
 
 @Aspect
 //@Order(2) // Aspect순서 숫자가 낮을수록 먼저한다.

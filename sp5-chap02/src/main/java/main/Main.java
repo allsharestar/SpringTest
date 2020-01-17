@@ -1,4 +1,4 @@
-package spring;
+package main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +8,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import config.AppCtx;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+import spring.WrongIdPasswordException;
 
 public class Main {
 	// 스프링 컨테이너를 사용하도록 변경
@@ -89,7 +98,7 @@ public class Main {
 	}
 	
 	private static void processListCommand() {
-		MemberListPrinter listPrinter = ctx.getBean("listPrinter", MemberListPrinter.class);
+		MemberListPrinter listPrinter = ctx.getBean(MemberListPrinter.class);
 		listPrinter.printAll();
 	}
 	
@@ -98,7 +107,7 @@ public class Main {
 			printHelp();
 			return;
 		}
-		MemberInfoPrinter infoPrinter = ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		MemberInfoPrinter infoPrinter = ctx.getBean(MemberInfoPrinter.class);
 		infoPrinter.printMemberInfo(arg[1]);
 	}
 	

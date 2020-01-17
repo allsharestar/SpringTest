@@ -1,27 +1,29 @@
 package config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import aspect.CacheAspect;
 import aspect.ExeTimeAspect;
 import chap07.Calculator;
 import chap07.RecCalculator;
+import spring.ChangePasswordService;
 import spring.MemberDao;
+import spring.MemberInfoPrinter;
 import spring.MemberListPrinter;
 import spring.MemberPrinter;
-import spring.MemberSummaryPrinter;
+import spring.MemberRegisterService;
 import spring.VersionPrinter;
 
 @Configuration
-@ComponentScan(basePackages = {"spring"},
-excludeFilters = @Filter(type = FilterType.REGEX, pattern = "spring\\..*Dao"))
-@EnableAspectJAutoProxy // Aspect애노테이션을 붙이 클래스를 공통 기능으로 적용하려면 붙여야하는 애노테이션
+@EnableTransactionManagement
+//@ComponentScan(basePackages = {"spring"},
+//excludeFilters = @Filter(type = FilterType.REGEX, pattern = "spring\\..*Dao"))
+//@EnableAspectJAutoProxy // Aspect애노테이션을 붙이 클래스를 공통 기능으로 적용하려면 붙여야하는 애노테이션
 // @EnableAspectJAutoProxy애노테이션을 붙이면 @Aspect애노테이션이 붙은 빈 객체를 찾아서 빈 객체의
 // Pointcut 설정과 @Around 설정을 사용한다.
 public class AppCtx {
@@ -31,20 +33,48 @@ public class AppCtx {
 	// pattern 속성은 FilterType에 적용할 값을 설정한다. 위 설정은 "spring."으로 시작하고 Dao로 끝나는 정규표현식을 지정
 	// spring.MemberDao 클래스를 컴포넌트 스캔 대상에서 제외한다.
 	
+	@Bean(destroyMethod = "close")
+	public DataSource dataSource() {
+		DataSource ds = new DataSource();
+		ds.setDriverClassName("com.mysql.jdbc.Driver");
+		ds.setUrl("jdbc:mysql://localhost/spring5fs?characterEncoding=utf8");
+		ds.setUsername("spring5");
+		ds.setPassword("spring5");
+		ds.setInitialSize(2);
+		ds.setMaxActive(10);
+		ds.setTestWhileIdle(true);
+		ds.setMinEvictableIdleTimeMillis(60000 * 3);
+		ds.setTimeBetweenEvictionRunsMillis(10 * 1000);
+		return ds;
+	}
+	@Bean
+	public PlatformTransactionManager transactionManager() {
+		// 스프링이 제공하는 트랜잭션 매니저 인터페이스
+		DataSourceTransactionManager tm = new DataSourceTransactionManager();
+		tm.setDataSource(dataSource());
+		return tm;
+	}
 	// MemberDao는 @Component 애노테이션이 붙여져있지만 Filter로 제외시켜서 다시등록시킴
 	@Bean
 	public MemberDao memberDao() {
-		return new MemberDao();
+		return new MemberDao(dataSource());
 	}
 	@Bean
-	@Qualifier("printer")
-	public MemberPrinter memberPrinter1() {
+	public ChangePasswordService changePwdSvc() {
+		ChangePasswordService pwdSvc = new ChangePasswordService();
+		return pwdSvc;
+	}
+	@Bean
+	public MemberPrinter memberPrinter() {
 		return new MemberPrinter();
 	}
 	@Bean
-	@Qualifier("summaryPrinter")
-	public MemberSummaryPrinter memberPrinter2() {
-		return new MemberSummaryPrinter();
+	public MemberListPrinter listPrinter() {
+		return new MemberListPrinter();
+	}
+	@Bean
+	public MemberInfoPrinter infoPrinter() {
+		return new MemberInfoPrinter();
 	}
 	@Bean
 	public VersionPrinter versionPrinter() {
@@ -52,6 +82,10 @@ public class AppCtx {
 		versionPrinter.setMajorVersion(5);
 		versionPrinter.setMinorVersion(0);
 		return versionPrinter;
+	}
+	@Bean
+	public MemberRegisterService MemberRegisterService() {
+		return new MemberRegisterService();
 	}
 	@Bean
 	public CacheAspect CacheAspect() {

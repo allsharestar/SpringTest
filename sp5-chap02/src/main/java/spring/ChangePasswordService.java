@@ -2,8 +2,8 @@ package spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Component
 public class ChangePasswordService {
 	// 비밀번호를 변경하는 클래스
 	
@@ -11,6 +11,7 @@ public class ChangePasswordService {
 	@Autowired
 	private MemberDao memberDao;
 	
+	@Transactional
 	public void ChangePasswordService(String email, String oldPwd, String newPwd) {
 		Member member = memberDao.selectByEmail(email);
 		
